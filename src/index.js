@@ -3,15 +3,22 @@ const path = require('path')
 const util = require('util')
 const { isAddress } = require('web3-utils')
 
-const { encodeCallsScript, encodeForward, encodeNewVote } = require('./encoding')
+const { encodeCallsScript, encodeExecute, encodeNewVote } = require('./encoding')
 
 function help() {
-  console.log("Usage: npm run create:vote -- <path to votes (see examples/)> <voting app address (optional; only required if votes don't specify one)>")
+  console.log("Usage: npm run create:vote -- <agent app address> <path to votes (see examples/)> <voting app address (optional; only required if votes don't specify one)>")
 }
 
 async function parseArgs() {
   // First two args are node and name of script
-  const [voteFilePath, votingAddress] = process.argv.slice(2, 4)
+  const [agentAddress, voteFilePath, votingAddress] = process.argv.slice(2, 4)
+
+  if (!isAddress(agentAddress)) {
+    console.error(`Error: agent app address ${agentAddress}' is not a valid address.`)
+    console.log()
+    help()
+    process.exit(0)
+  }
 
   let votes
   try {
@@ -68,12 +75,13 @@ async function parseArgs() {
   }, {})
 
   return {
+    agentAddress,
     votesByApp
   }
 }
 
 async function main() {
-  const { votesByApp } = await parseArgs()
+  const { agentAddress, votesByApp } = await parseArgs()
   const encodedNewVotesByApp = Object.entries(votesByApp).reduce(
     (encodedVotes, [votingApp, votes]) => {
       encodedVotes[votingApp] = votes.map(
@@ -91,22 +99,21 @@ async function main() {
     votes.forEach(({ title, data }) => console.log(`    ${title}: ${data}`))
   })
 
-  const callsScriptActions = []
+  const executeActions = []
     .concat(...Object.values(encodedNewVotesByApp))
     .map(({ data, to }) => ({
       data,
       to,
     }))
+    .map(({ to, data }) => ({
+      to: agentAddress,
+      data: encodeExecute(to, 0, data)
+    }))
 
-  const callsScript = encodeCallsScript(callsScriptActions)
+  const callsScript = encodeCallsScript(executeActions)
   console.log()
-  console.log('Calls script to create all votes:')
+  console.log('Calls script to create all votes via agent execution:')
   console.log('  ', callsScript)
-
-  const forwardData = encodeForward(callsScript)
-  console.log()
-  console.log('Transaction data to forward the calls script:')
-  console.log('  ', forwardData)
 }
 
 main()

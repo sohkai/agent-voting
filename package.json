@@ -10,6 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@aragon/apps-agent": "^2.0.0",
     "@aragon/apps-voting": "^2.1.0",
     "@aragon/os": "^4.3.0",
     "web3-eth-abi": "^1.2.2",
