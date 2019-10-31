@@ -1,0 +1,9 @@
+[
+  {
+    "title": "No action vote"
+  },
+  {
+    "title": "Vote with action",
+    "evmScript": "0x00000001"
+  }
+]
