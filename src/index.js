@@ -92,28 +92,47 @@ async function main() {
     {}
   )
 
+  // Generate transaction data to create each vote
   console.log()
-  console.log('Transaction data to create each vote, grouped by voting app:')
+  console.log('In case you need it, this is the transaction data to create each vote, grouped by voting app:')
   Object.entries(encodedNewVotesByApp).forEach(([votingApp, votes]) => {
     console.log(`  ${votingApp}:`)
     votes.forEach(({ title, data }) => console.log(`    ${title}: ${data}`))
   })
 
-  const executeActions = []
+  // Generate calls scripts to create all votes in one transaction
+  console.log()
+  console.log('============================================================')
+  console.log()
+  console.log("You can create these votes in one transaction, by either:")
+  console.log("  - Using `agent.forward()`")
+  console.log('  - Using another script runner, like the Voting app, to call `agent.execute()` for each vote')
+  console.log()
+  console.log('The EVM calls scripts are provided below for each case.')
+  console.log()
+  console.log('============================================================')
+
+  const newVoteActions = []
     .concat(...Object.values(encodedNewVotesByApp))
     .map(({ data, to }) => ({
       data,
       to,
     }))
+  const newVotesCallsScript = encodeCallsScript(newVoteActions)
+  console.log()
+  console.log('EVM calls script to create all votes via `agent.forward()`:')
+  console.log('  ', newVotesCallsScript)
+
+  const executeActions = newVoteActions
     .map(({ to, data }) => ({
       to: agentAddress,
       data: encodeExecute(to, 0, data)
     }))
 
-  const callsScript = encodeCallsScript(executeActions)
+  const executeCallsScript = encodeCallsScript(executeActions)
   console.log()
-  console.log('Calls script to create all votes via agent execution:')
-  console.log('  ', callsScript)
+  console.log('EVM calls script to create all votes via agent execution (using another script runner, e.g. `voting.newVote()`):')
+  console.log('  ', executeCallsScript)
 }
 
 main()

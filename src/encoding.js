@@ -1,5 +1,5 @@
 const abi = require('web3-eth-abi')
-const { EXECUTE_ABI, FORWARD_ABI, NEW_VOTE_ABI } = require('./abi')
+const { EXECUTE_ABI, NEW_VOTE_ABI } = require('./abi')
 
 const CALLSCRIPT_ID = '0x00000001'
 const EMPTY_CALLSCRIPT = '0x00000001'
@@ -47,13 +47,6 @@ function encodeExecute (target, ethValue, executionScript) {
   return abi.encodeFunctionCall(EXECUTE_ABI, [target, ethValue, executionScript])
 }
 
-function encodeForward (executionScript) {
-  if (!executionScript || executionScript === '0x') {
-    executionScript = EMPTY_CALLSCRIPT
-  }
-  return abi.encodeFunctionCall(FORWARD_ABI, [executionScript])
-}
-
 function encodeNewVote (executionScript, metadata) {
   if (!executionScript || executionScript === '0x') {
     executionScript = EMPTY_CALLSCRIPT
@@ -64,6 +57,5 @@ function encodeNewVote (executionScript, metadata) {
 module.exports = {
   encodeCallsScript,
   encodeExecute,
-  encodeForward,
   encodeNewVote,
 }
