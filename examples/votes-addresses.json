@@ -1,0 +1,15 @@
+[
+  {
+    "title": "No action vote",
+    "votingApp": "0x277bfcf7c2e162cb1ac3e9ae228a3132a75f83d4"
+  },
+  {
+    "title": "Another no action vote",
+    "votingApp": "0xcfee4d3078f74197ce77120dbfe6d35f443cab1c"
+  },
+  {
+    "title": "Vote with action",
+    "evmScript": "0x00000001",
+    "votingApp": "0xcfee4d3078f74197ce77120dbfe6d35f443cab1c"
+  }
+]
